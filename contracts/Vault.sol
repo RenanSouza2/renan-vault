@@ -10,11 +10,12 @@ contract Vault {
     error VaultUserHasVoted(address caller);
     error VaultInvalidCandidate(address invalid);
 
-    modifier isUser
+    modifier userHasVoted
     {
         if(hasVoted[msg.sender])
             revert VaultUserHasVoted(msg.sender);
 
+        hasVoted[msg.sender] = true;
         _;
     }
 
@@ -25,11 +26,9 @@ contract Vault {
         isCandidate[candidate] = true;
     }
 
-    function vote(address candidate) external isUser {
+    function vote(address candidate) external userHasVoted {
         if(!isCandidate[candidate])
             revert VaultInvalidCandidate(candidate);
-
-        hasVoted[msg.sender] = true;
 
         uint256 candidateVotes = votes[candidate];
         candidateVotes++;
